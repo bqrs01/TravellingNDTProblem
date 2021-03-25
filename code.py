@@ -1,9 +1,10 @@
 from datetime import datetime
-import json
+import json, random, operator
 import random
 import operator
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 # Here I am following a procedure given by this website: https://towardsdatascience.com/evolution-of-a-salesman-a-complete-genetic-algorithm-tutorial-for-python-6fe5d2b3ca35
 now = datetime(2021, 3, 25)
 
@@ -16,9 +17,9 @@ file.close()
 #print(times)
 
 class Airport:
-  def __init__(self, lat, long, IATA):
+  def __init__(self, lat, longI, IATA):
         self.lat = lat
-        self.long = long
+        self.long = longI
         self.IATA = IATA
   
   def time(self,airport):
@@ -26,7 +27,7 @@ class Airport:
     global times
     if cached:
         key = f'{self.IATA}_to_{airport.IATA}'
-        time = times[key]
+        time = times[key] / 10000
         return time
     else:
         distance_matrix = gmaps.distance_matrix((self.lat,self.long),
@@ -82,14 +83,13 @@ def createRoute(AirportList):
 
 def initialPopulation(popsize, AirportList):
   population = []
-  print(popsize)
-  for i in range(0,popsize):
+  for _ in range(popsize):
     population.append(createRoute(AirportList))              
   return population
 
 def rankRoutes(population):
   fitnessResults = {}
-  for i in range(0,len(population)):
+  for i in range(len(population)):
     fitnessResults[i] = Fitness(population[i]).routeFitness()
   return sorted(fitnessResults.items(), key = operator.itemgetter(1), reverse = True)
 
@@ -99,11 +99,11 @@ def selection(popRanked, eliteSize):
   df['cum_sum'] = df.Fitness.cumsum()
   df['cum_perc'] = 100*df.cum_sum/df.Fitness.sum()
     
-  for i in range(0, eliteSize):
+  for i in range(eliteSize):
     selectionResults.append(popRanked[i][0])
-  for i in range(0, len(popRanked) - eliteSize):
+  for i in range(len(popRanked) - eliteSize):
     pick = 100*random.random()
-  for i in range(0, len(popRanked)):
+  for i in range(len(popRanked)):
     if pick <= df.iat[i,3]:
       selectionResults.append(popRanked[i][0])
       break
@@ -111,7 +111,7 @@ def selection(popRanked, eliteSize):
 
 def matingPool(population, selectionResults):
   matingpool = []
-  for i in range(0, len(selectionResults)):
+  for i in range(len(selectionResults)):
     index = selectionResults[i]
     matingpool.append(population[index])
   return matingpool
@@ -137,9 +137,9 @@ def breedPopulation(matingpool, eliteSize):
   children = []
   length = len(matingpool) - eliteSize
   pool = random.sample(matingpool, len(matingpool))
-  for i in range(0,eliteSize):
+  for i in range(eliteSize):
     children.append(matingpool[i])
-  for i in range(0, length):
+  for i in range(length):
     child = breed(pool[i], pool[len(matingpool)-i-1])
     children.append(child)
   return children
@@ -156,7 +156,7 @@ def mutate(individual, mutationRate):
 
 def mutatePopulation(population, mutationRate):
   mutatedPop = []
-  for ind in range(0, len(population)):
+  for ind in range(len(population)):
     mutatedInd = mutate(population[ind], mutationRate)
     mutatedPop.append(mutatedInd)
   return mutatedPop
@@ -167,14 +167,12 @@ def nextGeneration(currentGen, eliteSize, mutationRate):
   matingpool = matingPool(currentGen, selectionResults)
   children = breedPopulation(matingpool, eliteSize)
   nextGeneration = mutatePopulation(children, mutationRate)
-  #print(nextGeneration)
-  l_spec = len(nextGeneration)
   return nextGeneration
 
 def geneticAlgorithm(population, popSize, eliteSize, mutationRate, generations):
   pop = initialPopulation(popSize, population)
   print("Initial time: " + str(1 / rankRoutes(pop)[0][1]), "seconds.")
-  for i in range(0, generations):
+  for i in range(generations):
     pop = nextGeneration(pop, eliteSize, mutationRate)
   print("Final time: " + str(1 / rankRoutes(pop)[0][1]), "seconds.")
   bestRouteIndex = rankRoutes(pop)[0][0]
@@ -188,5 +186,27 @@ AirportList = [Airport(51.189400,4.460280,"ANR"),Airport(50.901402,4.484440,"BRU
                Airport(51.956902,4.437220,"RTM"),Airport(52.127300,5.276190,"UTC"),Airport(52.275833,6.889167,"ENS"),Airport(52.166100,4.417940,"LID"),Airport(51.449100,4.342030,"WOE"),
                Airport(49.623333,6.204444,"LUX")]
 
-result = geneticAlgorithm(population=AirportList, popSize=1000, eliteSize=200, mutationRate=0.05, generations=5000)
-print(result)
+#result = geneticAlgorithm(population=AirportList, popSize=500, eliteSize=25, mutationRate=0.01, generations=10000)
+#print(result)
+
+def geneticAlgorithmPlot(population, popSize, eliteSize, mutationRate, generations):
+    pop = initialPopulation(popSize, population)
+    print("Initial time: " + str(1 / rankRoutes(pop)[0][1]), "seconds.")
+    progress = []
+    progress.append(1 / rankRoutes(pop)[0][1])
+    
+    for i in range(0, generations):
+        pop = nextGeneration(pop, eliteSize, mutationRate)
+        progress.append(1 / rankRoutes(pop)[0][1])
+    
+    plt.plot(progress)
+    plt.ylabel('Time')
+    plt.xlabel('Generation')
+    plt.show()
+
+geneticAlgorithmPlot(population=AirportList, popSize=100, eliteSize=10, mutationRate=0.01, generations=500)
+
+##airport1 = Airport(52, 4.5, "TES")
+##airport2 = Airport(1, 2, "ASR")
+
+##print(airport1.lat, airport2.lat)
