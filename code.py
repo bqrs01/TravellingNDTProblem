@@ -199,6 +199,8 @@ def geneticAlgorithmPlot(population, popSize, eliteSize, mutationRate, generatio
         pop = nextGeneration(pop, eliteSize, mutationRate)
         progress.append(1 / rankRoutes(pop)[0][1])
     
+    print(pop[0])
+
     plt.plot(progress)
     plt.ylabel('Time')
     plt.xlabel('Generation')

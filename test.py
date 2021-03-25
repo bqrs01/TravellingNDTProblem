@@ -219,9 +219,13 @@ def geneticAlgorithmPlot(population, popSize, eliteSize, mutationRate, generatio
         pop = nextGeneration(pop, eliteSize, mutationRate)
         progress.append(1 / rankRoutes(pop)[0][1])
     
+    print(pop[0])
+
     plt.plot(progress)
     plt.ylabel('Distance')
     plt.xlabel('Generation')
     plt.show()
 
 geneticAlgorithmPlot(population=cityList, popSize=200, eliteSize=20, mutationRate=0.01, generations=500)
+
+#BEST: [(CRL), (KJK), (OST), (BRU), (ANR), (OBL), (WOE), (UTC), (LEY), (ENS), (GRQ), (LWR), (DHR), (AMS), (LID), (RTM), (GLZ), (EIN), (MST), (LGG), (LUX)]
