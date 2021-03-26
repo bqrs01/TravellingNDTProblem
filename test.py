@@ -17,7 +17,6 @@ class City:
 
 file = open("times.json")
 times = json.loads(file.read())
-print(times)
 file.close()
 
 class City:
@@ -226,6 +225,8 @@ def geneticAlgorithmPlot(population, popSize, eliteSize, mutationRate, generatio
     plt.xlabel('Generation')
     plt.show()
 
-geneticAlgorithmPlot(population=cityList, popSize=200, eliteSize=20, mutationRate=0.01, generations=500)
+geneticAlgorithmPlot(population=cityList, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
 
 #BEST: [(CRL), (KJK), (OST), (BRU), (ANR), (OBL), (WOE), (UTC), (LEY), (ENS), (GRQ), (LWR), (DHR), (AMS), (LID), (RTM), (GLZ), (EIN), (MST), (LGG), (LUX)]
+#REAL BEST:[(KJK), (CRL), (LUX), (LGG), (MST), (EIN), (GLZ), (UTC), (LEY), (ENS), (GRQ), (LWR), (DHR), (AMS), (LID), (RTM), (WOE), (OBL), (ANR), (BRU), (OST)] 79222
+#REAL BEST 2:[(ENS), (LEY), (UTC), (GLZ), (EIN), (MST), (LGG), (LUX), (CRL), (KJK), (OST), (BRU), (ANR), (OBL), (WOE), (RTM), (LID), (AMS), (DHR), (LWR), (GRQ)] 79222
