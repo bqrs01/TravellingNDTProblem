@@ -17,6 +17,10 @@ def from_str_to_route(routeStr: str) -> List[Airport]:
     names = routeStr.split(' -> ')
     return [Airport(name) for name in names]
 
+def from_route_to_str(route: List[Airport]) -> str:
+    names = [b[0] for b in route]
+    return ' -> '.join(names)
+
 def get_time(route: List[Airport]) -> float:
     fitness = 0.0
     for i in range(len(route)):
@@ -31,4 +35,6 @@ def printDetailsOfRoute(routeStr: str):
     time = get_time(route)
     print(f'Route (starting with {route[0][0]} and ending with {route[len(route)-1][0]}) takes {time} seconds.')
 
-printDetailsOfRoute('LUX -> LGG -> MST -> EIN -> GLZ -> UTC -> LEY -> ENS -> GRQ -> LWR -> DHR -> AMS -> LID -> RTM -> WOE -> OBL -> ANR -> BRU -> OST -> KJK -> CRL')
+
+if __name__ == "__main__":
+    printDetailsOfRoute('LUX -> LGG -> MST -> EIN -> GLZ -> UTC -> LEY -> ENS -> GRQ -> LWR -> DHR -> AMS -> LID -> RTM -> WOE -> OBL -> ANR -> BRU -> OST -> KJK -> CRL')

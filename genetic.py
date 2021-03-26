@@ -2,6 +2,10 @@ from random import choices, randint, randrange, random, sample
 from typing import List, Optional, Callable, Tuple, NamedTuple
 import time
 
+bestFitness = 0.0
+bestFitnessReason = "start"
+fitnessChanged = False
+
 Genome = List[object]
 Population = List[Genome]
 PopulateFunc = Callable[[], Population]
@@ -63,12 +67,16 @@ def population_fitness(population: Population, fitness_func: FitnessFunc) -> flo
 def selection_pair(population: Population, fitness_func: FitnessFunc) -> Population:
     return choices(
         population=population,
-        weights=[fitness_func(gene) for gene in population],
+        weights=[(fitness_func(gene)) for gene in population],
         k=2
     )
+    #random_population = sample(population, k=2)
+    #i = randint(0, len(random_population)-1)
+    #return [random_population[i], random_population[len(random_population)-1-i]]
+    #return random_population
 
 def sort_population(population: Population, fitness_func: FitnessFunc) -> Population:
-    return sorted(population, key=fitness_func, reverse=True)
+    return sorted(population, key=lambda g: fitness_func(g), reverse=True)
 
 def run_evolution(
     populate_func: PopulateFunc,
@@ -79,6 +87,8 @@ def run_evolution(
     generation_limit: int = 200,
     eliteSize: int = 20) -> Tuple[Population, int]:
 
+    global bestFitness, fitnessChanged, bestFitnessReason
+
     population = populate_func()
 
     fitnesses = []
@@ -87,28 +97,49 @@ def run_evolution(
         
         print("g =", i)
         
+        if not fitnessChanged and not (bestFitness == 0.0):
+            bestFitnessReason = "from elite"
+        if not (bestFitness == 0.0):
+            print(1/bestFitness, bestFitnessReason)
+        else:
+            print('\inf', bestFitnessReason)
+
         population = sorted(population, key=lambda genome: fitness_func(genome), reverse=True)
-        
         
         next_generation = []
         
         for j in range(eliteSize):
             next_generation.append(population[j])
 
-        k=int(eliteSize/2) 
-
-        next_generation = next_generation + sample(population, k=k)
-
-        fitnesses.append(1/fitness_func(next_generation[0]))
+        k=2
+        non_elite = [p for p in population if p not in next_generation]
+        next_generation = next_generation + choices(population=non_elite, k=k)
         
+        #if not max(bestFitness, fitness_func(next_generation[0])) == bestFitness:
+        #    bestFitness = fitness_func(next_generation[0])
+        #    bestFitnessReason = ""
+        
+        fitnesses.append(1/fitness_func(next_generation[0]))
+        #print(fitnesses)
+        fitnessChanged = False
         for j in range(int(len(population) / 2 - 1)):
             if len(next_generation) >= len(population):
                 break
             parents = selection_func(population, fitness_func)
-            parents_random = sample(parents, 2)
-            offspring_a, offspring_b = crossover_func(parents_random[0], parents_random[1])
+            offspring_a, offspring_b = crossover_func(parents[0], parents[1])
             offspring_a = mutation_func(offspring_a)
             offspring_b = mutation_func(offspring_b)
+
+            if not max(fitness_func(offspring_a), bestFitness) == bestFitness:
+                bestFitness = fitness_func(offspring_a)
+                bestFitnessReason = "children (mutation and crossover)"
+                fitnessChanged = True
+
+            if not max(fitness_func(offspring_b), bestFitness) == bestFitness:
+                bestFitness = fitness_func(offspring_b)
+                bestFitnessReason = "children (mutation and crossover)"
+                fitnessChanged = True
+
             next_generation += [offspring_a, offspring_b]
         
         #print(len(next_generation))

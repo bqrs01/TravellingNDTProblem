@@ -203,9 +203,9 @@ for i in range(0,25):
 
 names = ["AMS", "ANR", "BRU", "CRL", "DHR", "EIN", "ENS", "GLZ", "GRQ",
             "KJK", "LEY", "LGG", "LID", "LUX", "LWR", "MST", "OBL", "OST",
-            "RTM", "UTC", "WOE"]
+            "RTM", "UTC", "WOE", "UDE"]
 
-for i in range(21):
+for i in range(len(names)):
     cityList.append(City(names[i]))
 
 def geneticAlgorithmPlot(population, popSize, eliteSize, mutationRate, generations):
@@ -218,15 +218,17 @@ def geneticAlgorithmPlot(population, popSize, eliteSize, mutationRate, generatio
         pop = nextGeneration(pop, eliteSize, mutationRate)
         progress.append(1 / rankRoutes(pop)[0][1])
     
-    print(pop[0])
+    print(pop[0], 1/rankRoutes(pop)[0][1])
 
     plt.plot(progress)
     plt.ylabel('Distance')
     plt.xlabel('Generation')
     plt.show()
 
-geneticAlgorithmPlot(population=cityList, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
+geneticAlgorithmPlot(population=cityList, popSize=200, eliteSize=20, mutationRate=0.01, generations=200)
 
 #BEST: [(CRL), (KJK), (OST), (BRU), (ANR), (OBL), (WOE), (UTC), (LEY), (ENS), (GRQ), (LWR), (DHR), (AMS), (LID), (RTM), (GLZ), (EIN), (MST), (LGG), (LUX)]
 #REAL BEST:[(KJK), (CRL), (LUX), (LGG), (MST), (EIN), (GLZ), (UTC), (LEY), (ENS), (GRQ), (LWR), (DHR), (AMS), (LID), (RTM), (WOE), (OBL), (ANR), (BRU), (OST)] 79222
 #REAL BEST 2:[(ENS), (LEY), (UTC), (GLZ), (EIN), (MST), (LGG), (LUX), (CRL), (KJK), (OST), (BRU), (ANR), (OBL), (WOE), (RTM), (LID), (AMS), (DHR), (LWR), (GRQ)] 79222
+
+#PROPER [(UDE), (ENS), (GRQ), (LWR), (DHR), (LEY), (UTC), (AMS), (LID), (RTM), (GLZ), (OBL), (WOE), (ANR), (BRU), (OST), (KJK), (CRL), (LUX), (LGG), (MST), (EIN)]
