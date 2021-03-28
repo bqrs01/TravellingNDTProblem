@@ -1,2 +1,5 @@
 .vscode
 __pycache__
+publishing.py
+misc
+test.py
